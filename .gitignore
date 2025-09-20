@@ -218,3 +218,4 @@ __marimo__/
 #-------Custom-----------
 #Logs
 *.log
+logs/net_monitor.log
