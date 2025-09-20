@@ -48,7 +48,6 @@ class sniffer():
         "17. multicast \n" \
         "0. no filter \n"))
         
-    
     def simple_sniffer(self):
         from scapy.all import sniff
         packets = sniff(count=self.sniff_packets_count)
@@ -91,11 +90,23 @@ class sniffer():
             log.writelines(packets_filt_info)
         return "Success. Log in logs/net_monitor.log (unfiltered) and filtered.log (filtered)"
     
+    
 
 # final start part
 load_process()
-net_mon = sniffer()
-if net_mon.filter_setting > 0:
-    net_mon.filter_sniffer()
-else:
-    net_mon.simple_sniffer()
+act = int(input("Actions: \n" \
+                "1.Sniffer \n" \
+                "2.Clear logs \n"))
+if act == 1:
+    net_mon = sniffer()
+    if net_mon.filter_setting > 0:
+        net_mon.filter_sniffer()
+    else:
+        net_mon.simple_sniffer()
+elif act == 2:
+    with open("logs/filtered.log", "w") as log:
+        pass
+    with open("logs/net_monitor.log", "w") as log:
+        pass
+    print("Done")
+    exit(0)
