@@ -47,21 +47,45 @@ class sniffer():
         "16. broadcast \n" \
         "17. multicast \n" \
         "0. no filter \n"))
-        
+        self.format = int(input("Specify logs format: \n" \
+                                "1. PCAP  \n" \
+                                "2. Text only logs \n"
+                                "3. Both \n"))
+
     def simple_sniffer(self):
         from scapy.all import sniff
         packets = sniff(count=self.sniff_packets_count)
-        packets_info = [pkt.summary() + "\n" for pkt in packets]
-        with open("logs/net_monitor.log", "a") as log:
-            log.writelines(packets_info)
-        return "Success. Log in logs/net_monitor.log"
+        if self.format == 1:
+            from scapy.all import wrpcap
+            wrpcap("logs/captured_packets.pcap", packets)
+        elif self.format == 2:
+            packets_info = [pkt.summary() + "\n" for pkt in packets]
+            with open("logs/net_monitor.log", "a") as log:
+                log.writelines(packets_info)
+        else:
+            from scapy.all import wrpcap
+            wrpcap("logs/captured_packets.pcap", packets)
+            packets_info = [pkt.summary() + "\n" for pkt in packets]
+            with open("logs/net_monitor.log", "a") as log:
+                log.writelines(packets_info)
+        return "Success. Log in logs/net_monitor.log or/and logs/captured_packets.pcap"
     
     def filter_sniffer(self):
         from scapy.all import sniff
         packets = sniff(count=self.sniff_packets_count)
-        packets_info = [pkt.summary() + "\n" for pkt in packets]
-        with open("logs/net_monitor.log", "a") as log:
-            log.writelines(packets_info)
+        if self.format == 1:
+            from scapy.all import wrpcap
+            wrpcap("logs/captured_packets.pcap", packets)
+        elif self.format == 2:
+            packets_info = [pkt.summary() + "\n" for pkt in packets]
+            with open("logs/net_monitor.log", "a") as log:
+                log.writelines(packets_info)
+        else:
+            from scapy.all import wrpcap
+            wrpcap("logs/captured_packets.pcap", packets)
+            packets_info = [pkt.summary() + "\n" for pkt in packets]
+            with open("logs/net_monitor.log", "a") as log:
+                log.writelines(packets_info)
         # filter part
         filter_map = {
             0: "",                    # no filter
@@ -85,13 +109,21 @@ class sniffer():
         }
         bpf_filter = filter_map.get(self.filter_setting, "")
         packets_filt = sniff(count=self.sniff_packets_count, filter=bpf_filter)
-        packets_filt_info = [pkt_f.summary() + "\n" for pkt_f in packets_filt]
-        with open("logs/filtered.log", "a") as log:
-            log.writelines(packets_filt_info)
-        return "Success. Log in logs/net_monitor.log (unfiltered) and filtered.log (filtered)"
+        if self.format == 1:
+            from scapy.all import wrpcap
+            wrpcap("logs/captured_packets_filtered.pcap", packets_filt)
+        elif self.format == 2:
+            packets_info_filtered = [pkt.summary() + "\n" for pkt in packets_filt]
+            with open("logs/filtered.log", "a") as log_f:
+                log_f.writelines(packets_info_filtered)
+        else:
+            from scapy.all import wrpcap
+            wrpcap("logs/captured_packets_filtered.pcap", packets_filt)
+            packets_info_filtered = [pkt_f.summary() + "\n" for pkt_f in packets_filt]
+            with open("logs/filtered.log", "a") as log_f:
+                log_f.writelines(packets_info_filtered)
+        return "Success. Log in logs/net_monitor.log (unfiltered) and filtered.log (filtered) or/and logs/captured_packets.pcap (unfiltered) and logs/captured_packets_filtered.pcap (filtered)"
     
-    
-
 # final start part
 load_process()
 act = int(input("Actions: \n" \
