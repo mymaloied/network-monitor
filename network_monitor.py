@@ -1,6 +1,8 @@
 def load_process():
     import sys
-    import time
+    import os
+    if not os.path.exists("logs"):
+        os.makedirs("logs")
     def check_dependencies():
         try:
             from scapy.all import sniff
@@ -24,33 +26,52 @@ def load_process():
     else:
         print("load finished succesfully")
 
-class sniffer():
+def get_valid_input(prompt, min_val, max_val):
+        while True:
+            try:
+                value = int(input(prompt))
+                if min_val <= value <= max_val:
+                    return value
+                print(f"Please enter a number between {min_val} and {max_val}")
+            except ValueError:
+                print("Please enter a valid number")
 
+class sniffer():
     def __init__(self):
-        self.sniff_packets_count = int(input("Enter the count of packets, you want to sniff: "))
-        self.filter_setting = int(input("Enter the the keynumber of your filter: \n" \
-        "1. http \n" \
-        "2. tcp \n" \
-        "3. udp \n" \
-        "4. icmp \n" \
-        "5. dns \n" \
-        "6. arp \n" \
-        "7. port 80 \n" \
-        "8. port 443 \n" \
-        "9. port 53 \n" \
-        "10. port 22 \n" \
-        "11. tcp and port 80 \n" \
-        "12. udp and port 53 \n" \
-        "13. not tcp \n" \
-        "14. host 8.8.8.8 \n" \
-        "15. net 192.168.1.0/24 \n" \
-        "16. broadcast \n" \
-        "17. multicast \n" \
-        "0. no filter \n"))
-        self.format = int(input("Specify logs format: \n" \
-                                "1. PCAP  \n" \
-                                "2. Text only logs \n"
-                                "3. Both \n"))
+        self.sniff_packets_count = get_valid_input(
+        "Enter the count of packets (1-1000): ", 
+        min_val=1, 
+        max_val=1000)
+        self.filter_setting = get_valid_input(
+        "Enter the the keynumber of your filter: \n" +
+        "1. http \n" +
+        "2. tcp \n" +
+        "3. udp \n" +
+        "4. icmp \n" +
+        "5. dns \n" +
+        "6. arp \n" +
+        "7. port 80 \n" +
+        "8. port 443 \n" +
+        "9. port 53 \n" +
+        "10. port 22 \n" +
+        "11. tcp and port 80 \n" +
+        "12. udp and port 53 \n" +
+        "13. not tcp \n" +
+        "14. host 8.8.8.8 \n" +
+        "15. net 192.168.1.0/24 \n" +
+        "16. broadcast \n" +
+        "17. multicast \n" +
+        "0. no filter \n" ,
+        min_val=0,
+        max_val=17)
+        self.format = get_valid_input(
+            "Specify logs format: \n" +
+            "1. PCAP \n" +
+            "2. Text only logs \n" +
+            "3. Both \n", 
+            min_val=1, 
+            max_val=3
+        )
 
     def simple_sniffer(self):
         from scapy.all import sniff
@@ -113,7 +134,7 @@ class sniffer():
             from scapy.all import wrpcap
             wrpcap("logs/captured_packets_filtered.pcap", packets_filt)
         elif self.format == 2:
-            packets_info_filtered = [pkt.summary() + "\n" for pkt in packets_filt]
+            packets_info_filtered = [pkt_f.summary() + "\n" for pkt_f in packets_filt]
             with open("logs/filtered.log", "a") as log_f:
                 log_f.writelines(packets_info_filtered)
         else:
@@ -126,9 +147,11 @@ class sniffer():
     
 # final start part
 load_process()
-act = int(input("Actions: \n" \
-                "1.Sniffer \n" \
-                "2.Clear logs \n"))
+act = get_valid_input("Actions: \n" +
+                "1.Sniffer \n" +
+                "2.Clear logs \n",
+                min_val=1,
+                max_val=2)
 if act == 1:
     net_mon = sniffer()
     if net_mon.filter_setting > 0:
