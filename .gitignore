@@ -221,3 +221,7 @@ __marimo__/
 *.log
 *.pcap
 logs/
+logs/net_monitor.log
+logs/captured_packets.pcap
+logs/filtered.log
+logs/captured_packets_filtered.pcap
